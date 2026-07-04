@@ -35,10 +35,10 @@ export default function Contact() {
               <h1
                 className="text-5xl sm:text-6xl font-bold text-[#F5F7FA] mb-4 font-playfair"
               >
-                Let's build something great.
+                {`Let's build something great.`}
               </h1>
               <p className="text-[#8BA5C8] text-lg">
-                We'll respond to your inquiry within 24 hours.
+                {`We'll respond to your inquiry within 24 hours.`}
               </p>
             </motion.div>
 
