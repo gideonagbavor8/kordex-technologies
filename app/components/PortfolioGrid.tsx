@@ -1,132 +1,74 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProjectCard from './ProjectCard';
-
-type Category = 'All' | 'Web & App' | 'AI' | 'Cybersecurity' | 'EdTech';
-
-const projects = [
-  {
-    id: 1,
-    name: 'CurriculumCraft AI',
-    description:
-      'AI-powered lesson planning platform designed specifically for Ghanaian JHS teachers. Generates curriculum-aligned lessons instantly.',
-    stack: ['Next.js 15', 'Tailwind CSS v4', 'Drizzle ORM', 'Neon PostgreSQL', 'GitHub Models'],
-    category: ['AI', 'EdTech'],
-    live: 'https://curriculumcraft-ai.vercel.app',
-    github: 'https://github.com/gideonagbavor8/curriculumcraft-ai',
-  },
-  {
-    id: 2,
-    name: 'Tarso Hotel Website',
-    description:
-      'Professional hotel website with modern booking interface and responsive design for premium user experience.',
-    stack: ['Next.js', 'Tailwind CSS', 'Vercel'],
-    category: ['Web & App'],
-    live: 'https://tarso-hotel.vercel.app',
-  },
-  {
-    id: 3,
-    name: 'TaskFlow',
-    description:
-      'Full-stack task management application with real-time collaboration features and intuitive UI.',
-    stack: ['Next.js', 'Supabase', 'PostgreSQL', 'Tailwind CSS'],
-    category: ['Web & App'],
-  },
-  {
-    id: 4,
-    name: 'SecureVault',
-    description:
-      'Enterprise-grade password manager with AES-256-GCM encryption and secure credential storage.',
-    stack: ['Next.js', 'Express', 'PostgreSQL', 'Docker', 'Encryption'],
-    category: ['Cybersecurity', 'Web & App'],
-  },
-  {
-    id: 5,
-    name: 'EduKrom LMS',
-    description:
-      'Ghana-specific Learning Management System aligned to NaCCA/GES curriculum standards. Complete school management suite.',
-    stack: ['Next.js', 'Node.js', 'Prisma', 'PostgreSQL', 'Turborepo'],
-    category: ['EdTech'],
-  },
-  {
-    id: 6,
-    name: 'PhishPhalanx',
-    description:
-      'Advanced threat intelligence CLI tool for cybersecurity professionals. Real-time threat detection and analysis.',
-    stack: ['Node.js', 'MongoDB', 'CLI'],
-    category: ['Cybersecurity'],
-    github: 'https://github.com/gideonagbavor8/phishphalanx',
-  },
-];
+import { projects, projectCategories, type ProjectCategory } from '@/lib/projects';
 
 export default function PortfolioGrid() {
-  const [activeFilter, setActiveFilter] = useState<Category>('All');
+  const [activeFilter, setActiveFilter] = useState<ProjectCategory | 'All'>('All');
 
-  const categories: Category[] = ['All', 'Web & App', 'AI', 'Cybersecurity', 'EdTech'];
-
-  const filteredProjects =
+  const filtered =
     activeFilter === 'All'
       ? projects
       : projects.filter((p) => p.category.includes(activeFilter));
 
   return (
-    <section className="py-20 bg-[#0A1628] px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Filter Buttons */}
+    <section className="border-t border-[var(--surface-hairline)] bg-[var(--surface-base)] py-20 sm:py-24">
+      <div className="container-page">
+        {/* Filters */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.55 }}
           viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-3 mb-16"
+          className="mb-14 flex flex-wrap justify-center gap-2"
+          role="group"
+          aria-label="Filter projects by category"
         >
-          {categories.map((cat) => (
-            <motion.button
-              key={cat}
-              onClick={() => setActiveFilter(cat)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                activeFilter === cat
-                  ? 'bg-[#1E6FD9] text-white shadow-lg shadow-[#1E6FD9]/50'
-                  : 'bg-[#112040] text-[#8BA5C8] border border-[#1E6FD9]/20 hover:border-[#1E6FD9]/40 hover:text-[#4A9FFF]'
-              }`}
-            >
-              {cat}
-            </motion.button>
-          ))}
+          {projectCategories.map((cat) => {
+            const active = activeFilter === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveFilter(cat)}
+                aria-pressed={active}
+                className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  active
+                    ? 'text-white'
+                    : 'border border-[var(--surface-hairline)] text-[var(--text-secondary)] hover:border-[var(--surface-hairline-strong)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="filter-pill"
+                    className="absolute inset-0 rounded-full bg-[var(--brand)]"
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                )}
+                <span className="relative">{cat}</span>
+              </button>
+            );
+          })}
         </motion.div>
 
-        {/* Projects Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {filteredProjects.map((project, index) => (
-            <ProjectCard
-              key={project.id}
-              name={project.name}
-              description={project.description}
-              stack={project.stack}
-              category={project.category}
-              live={project.live}
-              github={project.github}
-              index={index}
-            />
-          ))}
+        {/* Grid */}
+        <motion.div layout className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {filtered.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </AnimatePresence>
         </motion.div>
 
-        {/* Empty State */}
-        {filteredProjects.length === 0 && (
-          <motion.div
+        {filtered.length === 0 && (
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12"
+            className="py-16 text-center text-[var(--text-tertiary)]"
           >
-            <p className="text-[#8BA5C8]">No projects found in this category.</p>
-          </motion.div>
+            No projects in this category yet.
+          </motion.p>
         )}
       </div>
     </section>

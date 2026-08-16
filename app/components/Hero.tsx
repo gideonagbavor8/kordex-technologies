@@ -2,132 +2,139 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { IconArrowRight } from './Icons';
 
 export default function Hero() {
-  const containerVariants = {
+  const ease = [0.22, 1, 0.36, 1] as const;
+
+  const container = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.09, delayChildren: 0.05 },
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as const },
-    },
+  const item = {
+    hidden: { opacity: 0, y: 22 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.75, ease } },
   };
 
-  const badgeVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const },
-    },
-  };
-
-  const stats = [
-    { label: '4+ Service areas', value: '' },
-    { label: '100% Remote-ready', value: '' },
-    { label: 'GH Based in Ghana', value: '' },
+  // Commitments, not vanity metrics. Each answers an objection a school head
+  // actually raises: will they reply, do they know our curriculum, will the
+  // price move after we sign?
+  const commitments = [
+    { value: '24 hrs', label: 'Every enquiry answered' },
+    { value: 'NaCCA-aligned', label: 'Built to the Ghanaian curriculum' },
+    { value: 'Fixed price', label: 'Agreed before work starts' },
   ];
 
   return (
-    <section className="relative min-h-screen bg-[#0A1628] overflow-hidden flex items-center justify-center pt-20">
-      {/* Grid background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(90deg, #1E6FD9 1px, transparent 1px), linear-gradient(0deg, #1E6FD9 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
-        }} />
-      </div>
+    <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden bg-[var(--surface-base)] pt-28 pb-20">
+      {/* Ground texture, masked so it fades before the copy starts */}
+      <div
+        className="dot-field absolute inset-0 opacity-[0.5]"
+        style={{
+          maskImage: 'radial-gradient(ellipse 75% 55% at 50% 40%, #000 20%, transparent 78%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 75% 55% at 50% 40%, #000 20%, transparent 78%)',
+        }}
+      />
 
-      {/* Blue glow radial gradients */}
-      <div className="absolute top-1/4 -left-64 w-96 h-96 bg-[#1E6FD9] rounded-full opacity-10 blur-3xl" />
-      <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-[#4A9FFF] rounded-full opacity-5 blur-3xl" />
+      {/* Depth: two soft light sources, offset so the glow is not symmetrical */}
+      <div className="pointer-events-none absolute -left-40 top-[12%] h-[34rem] w-[34rem] rounded-full bg-[var(--brand)] opacity-[0.13] blur-[130px]" />
+      <div className="pointer-events-none absolute -right-32 bottom-[6%] h-[26rem] w-[26rem] rounded-full bg-[var(--brand-bright)] opacity-[0.07] blur-[120px]" />
 
-      {/* Content */}
+      {/* Horizon line at the base of the hero */}
+      <div className="rule-fade absolute inset-x-0 bottom-0" />
+
       <motion.div
-        variants={containerVariants}
+        variants={container}
         initial="hidden"
         animate="visible"
-        className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        className="container-page relative z-10"
       >
-        {/* Badge */}
-        <motion.div variants={badgeVariants} className="mb-8 flex justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E6FD9]/10 border border-[#1E6FD9]/20">
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 bg-[#4A9FFF] rounded-full"
-            />
-            <span className="text-[#4A9FFF] text-sm font-medium">
-              Now accepting new projects
+        <div className="mx-auto max-w-3xl text-center">
+          {/* Availability badge */}
+          <motion.div variants={item} className="mb-8 flex justify-center">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-[var(--surface-hairline-strong)] bg-[var(--brand-dim)] px-4 py-2 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <motion.span
+                  animate={{ scale: [1, 2.2, 1], opacity: [0.7, 0, 0.7] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="absolute inline-flex h-full w-full rounded-full bg-[var(--brand-bright)]"
+                />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--brand-bright)]" />
+              </span>
+              <span className="text-sm font-medium text-[var(--brand-bright)]">
+                Onboarding schools for the 2026/27 academic year
+              </span>
             </span>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Headline */}
-        <motion.h1
-          variants={itemVariants}
-          className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#F5F7FA] mb-6"
-          style={{ fontFamily: 'var(--font-playfair)' }}
-        >
-          Connecting ideas to intelligent execution.
-        </motion.h1>
-
-        {/* Subtext */}
-        <motion.p
-          variants={itemVariants}
-          className="text-lg sm:text-xl text-[#8BA5C8] mb-10 max-w-2xl mx-auto leading-relaxed"
-        >
-          Kordex Technologies builds world-class web applications, AI-powered tools,
-          cybersecurity solutions, and education technology — crafted in Ghana, delivered
-          globally.
-        </motion.p>
-
-        {/* CTA Buttons */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-        >
-          <Link
-            href="/services"
-            className="px-8 py-3 bg-[#1E6FD9] text-white rounded-lg font-medium hover:bg-[#4A9FFF] transition-colors"
+          <motion.h1
+            variants={item}
+            className="font-display text-[length:var(--text-display)] leading-[1.02] text-[var(--text-primary)]"
           >
-            Explore Services
-          </Link>
-          <Link
-            href="/contact"
-            className="px-8 py-3 border-2 border-[#1E6FD9] text-[#1E6FD9] rounded-lg font-medium hover:bg-[#1E6FD9]/10 transition-colors"
-          >
-            Start a Project →
-          </Link>
-        </motion.div>
+            Software for African schools,
+            <br className="hidden sm:block" />{' '}
+            <span className="relative inline-block">
+              <span className="relative z-10 italic text-[var(--brand-bright)]">
+                built by a teacher.
+              </span>
+              <motion.span
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.9, delay: 0.85, ease }}
+                className="absolute inset-x-0 bottom-1.5 z-0 h-[0.35em] origin-left bg-[var(--brand)] opacity-20"
+              />
+            </span>
+          </motion.h1>
 
-        {/* Stats */}
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-8 border-t border-[#1E6FD9]/20"
-        >
-          {stats.map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+          <motion.p
+            variants={item}
+            className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)] sm:text-xl"
+          >
+            Kordex builds the systems Ghanaian schools actually need — lesson planning,
+            student records, admissions and results — designed by someone who taught in
+            the classroom before writing the code.
+          </motion.p>
+
+          <motion.div
+            variants={item}
+            className="mt-10 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4"
+          >
+            <Link
+              href="/contact"
+              className="group inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--brand)] px-7 py-3.5 font-semibold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[var(--brand-bright)] hover:shadow-xl hover:shadow-[var(--brand)]/30"
             >
-              <p className="text-[#E8EDF5] font-semibold">{stat.label}</p>
-            </motion.div>
+              Book a free consultation
+              <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              href="/services"
+              className="inline-flex items-center justify-center rounded-lg border border-[var(--surface-hairline-strong)] px-7 py-3.5 font-semibold text-[var(--text-primary)] transition-colors hover:border-[var(--brand-bright)] hover:bg-white/[0.03]"
+            >
+              See what we build
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Commitments */}
+        <motion.dl
+          variants={item}
+          className="mx-auto mt-20 grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-xl border border-[var(--surface-hairline)] bg-[var(--surface-hairline)] sm:grid-cols-3"
+        >
+          {commitments.map((c) => (
+            <div
+              key={c.value}
+              className="bg-[var(--surface-base)] px-6 py-6 text-center transition-colors hover:bg-[var(--surface-raised)]"
+            >
+              <dt className="font-display text-2xl text-[var(--text-primary)]">{c.value}</dt>
+              <dd className="mt-1.5 text-sm text-[var(--text-tertiary)]">{c.label}</dd>
+            </div>
           ))}
-        </motion.div>
+        </motion.dl>
       </motion.div>
     </section>
   );

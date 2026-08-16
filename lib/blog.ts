@@ -12,7 +12,8 @@ export interface BlogPost {
   content: string;
 }
 
-export interface BlogPostMeta extends Omit<BlogPost, 'content'> {}
+/** A post without its body — what the index and cards need. */
+export type BlogPostMeta = Omit<BlogPost, 'content'>;
 
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog');
 

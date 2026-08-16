@@ -1,13 +1,14 @@
-import type { Metadata} from 'next';
+import type { Metadata } from 'next';
 import AboutHero from '../components/AboutHero';
 import FounderSection from '../components/FounderSection';
-import TechStack from '../components/TechStack';
 import ValuesSection from '../components/ValuesSection';
-import AboutCTA from '../components/AboutCTA';
+import TechStack from '../components/TechStack';
+import CTABanner from '../components/CTABanner';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'Learn about Kordex Technologies and founder Gideon Agbavor — a Ghanaian software developer, educator, and AI builder.',
+  description:
+    'Kordex Technologies is a Ghanaian education technology company founded by Gideon Agbavor, a former Ghana Education Service teacher who now builds the software schools here actually need.',
 };
 
 export default function About() {
@@ -15,9 +16,9 @@ export default function About() {
     <main className="w-full">
       <AboutHero />
       <FounderSection />
-      <TechStack />
       <ValuesSection />
-      <AboutCTA />
+      <TechStack />
+      <CTABanner />
     </main>
   );
 }
