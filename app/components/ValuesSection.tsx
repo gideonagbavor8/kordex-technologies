@@ -1,82 +1,73 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Section, { SectionHeading, revealVariants, staggerVariants } from './Section';
+import { IconCompass, IconChecklist, IconChat, IconClock } from './Icons';
+
+/**
+ * Principles worth stating are ones a client could hold us to. Generic virtues
+ * ("excellence", "innovation") tell a buyer nothing, so each of these is a
+ * commitment with a visible consequence.
+ */
+const values = [
+  {
+    icon: IconCompass,
+    title: 'Built for here',
+    body: 'NaCCA standards, GES reporting formats and Ghanaian fee structures are the starting point, not a localisation task we get to later.',
+  },
+  {
+    icon: IconChecklist,
+    title: 'Priced before we start',
+    body: 'You approve a fixed figure against a written scope. If the scope changes, we quote the change before doing the work — never after.',
+  },
+  {
+    icon: IconChat,
+    title: 'You talk to the builder',
+    body: 'No account managers relaying messages. The person answering your questions is the person writing your software.',
+  },
+  {
+    icon: IconClock,
+    title: 'We stay for the first term',
+    body: 'Launch is the easy part. We stay close through your first full term, because that is when the questions that matter actually surface.',
+  },
+];
 
 export default function ValuesSection() {
-  const values = [
-    {
-      title: 'African Excellence',
-      description: 'Proud to build world-class solutions rooted in African innovation and excellence.',
-    },
-    {
-      title: 'Global Standards',
-      description: 'We adhere to international best practices in technology, security, and quality.',
-    },
-    {
-      title: 'Reliable Delivery',
-      description: 'Consistent, on-time delivery with a commitment to your success.',
-    },
-    {
-      title: 'Clear Communication',
-      description: 'Transparent, honest conversations with every stakeholder at every stage.',
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <section className="py-20 bg-[#0A1628] px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-4xl font-bold text-center text-[#F5F7FA] mb-12"
-          style={{ fontFamily: 'var(--font-playfair)' }}
-        >
-          Our Values
-        </motion.h2>
+    <Section tone="base" divided>
+      <SectionHeading
+        eyebrow="How we operate"
+        title="Four commitments you can hold us to"
+        lead="Stated plainly, so you can tell whether we kept them."
+      />
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-        >
-          {values.map((value, i) => (
-            <motion.div
-              key={i}
-              variants={cardVariants}
-              whileHover={{ y: -8 }}
-              className="p-8 bg-gradient-to-br from-[#112040] to-[#0A1628] border border-[#1E6FD9]/20 rounded-xl hover:border-[#1E6FD9]/40 transition-all"
-            >
-              <h3 className="text-2xl font-semibold text-[#1E6FD9] mb-3">
-                {value.title}
+      <motion.div
+        variants={staggerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px' }}
+        className="grid grid-cols-1 gap-5 md:grid-cols-2"
+      >
+        {values.map(({ icon: Icon, title, body }) => (
+          <motion.div
+            key={title}
+            variants={revealVariants}
+            className="panel panel-interactive group flex gap-5 p-7"
+          >
+            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[var(--surface-hairline)] bg-[var(--brand-dim)] text-[var(--brand-bright)] transition-colors group-hover:border-[var(--brand)] group-hover:bg-[var(--brand)] group-hover:text-white">
+              <Icon className="h-5 w-5" />
+            </span>
+            <div>
+              <h3 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">
+                {title}
               </h3>
-              <p className="text-[#8BA5C8]">{value.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+              <p className="text-[15px] leading-relaxed text-[var(--text-secondary)]">
+                {body}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </Section>
   );
 }

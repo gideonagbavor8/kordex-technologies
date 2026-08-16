@@ -20,7 +20,7 @@ export default function ScrollToTop() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 z-50 w-11 h-11 bg-[#1E6FD9] hover:bg-[#2578e8] text-white rounded-lg flex items-center justify-center shadow-lg transition-colors"
+          className="fixed bottom-28 right-8 z-50 w-11 h-11 bg-[#1E6FD9] hover:bg-[#2578e8] text-white rounded-lg flex items-center justify-center shadow-lg transition-colors"
           aria-label="Scroll to top"
         >
           ↑

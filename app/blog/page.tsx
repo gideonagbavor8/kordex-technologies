@@ -6,7 +6,8 @@ import { getAllBlogPosts } from '@/lib/blog';
 
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'Insights on software development, AI, cybersecurity, and tech for African businesses — by Kordex Technologies.',
+  description:
+    'Practical writing on school systems, curriculum technology and using AI responsibly in Ghanaian classrooms — from Kordex Technologies.',
 };
 
 export default function Blog() {

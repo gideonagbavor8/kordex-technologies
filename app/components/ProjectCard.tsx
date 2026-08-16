@@ -1,94 +1,93 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { IconArrowRight } from './Icons';
+import type { Project, ProjectType } from '@/lib/projects';
 
-interface ProjectCardProps {
-  name: string;
-  description: string;
-  stack: string[];
-  category: string[];
-  live?: string;
-  github?: string;
-  index: number;
-}
+const typeStyles: Record<ProjectType, string> = {
+  'Client project': 'border-[var(--success)]/35 bg-[var(--success)]/10 text-[var(--success)]',
+  'In-house product': 'border-[var(--brand-bright)]/35 bg-[var(--brand-dim)] text-[var(--brand-bright)]',
+  'Open source': 'border-[var(--surface-hairline-strong)] text-[var(--text-tertiary)]',
+};
 
 export default function ProjectCard({
-  name,
-  description,
-  stack,
-  category,
-  live,
-  github,
+  project,
   index,
-}: ProjectCardProps) {
+}: {
+  project: Project;
+  index: number;
+}) {
+  const hasLinks = Boolean(project.live || project.github);
+
   return (
-    <motion.div
+    <motion.article
+      layout
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      className="group relative p-6 bg-gradient-to-br from-[#112040] to-[#0A1628] border border-[#1E6FD9]/20 rounded-xl hover:border-[#1E6FD9]/60 transition-all duration-300 overflow-hidden"
+      transition={{ delay: Math.min(index, 5) * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, margin: '-40px' }}
+      className="panel panel-interactive group flex flex-col p-7"
     >
-      {/* Glow effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#1E6FD9]/0 via-[#1E6FD9]/10 to-[#1E6FD9]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="mb-4">
-          <h3 className="text-xl font-semibold text-[#E8EDF5] mb-2">{name}</h3>
-          <p className="text-[#8BA5C8] text-sm leading-relaxed">{description}</p>
-        </div>
-
-        {/* Categories */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {category.map((cat, i) => (
-            <span
-              key={i}
-              className="px-2 py-1 text-xs font-medium bg-[#1E6FD9]/30 text-[#4A9FFF] rounded-full"
-            >
-              {cat}
-            </span>
-          ))}
-        </div>
-
-        {/* Tech Stack */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {stack.map((tech, i) => (
-            <span
-              key={i}
-              className="px-2 py-1 text-xs bg-[#1E6FD9]/20 text-[#4A9FFF] rounded"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        {/* Links */}
-        <div className="flex gap-3">
-          {live && (
-            <a
-              href={live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 px-4 py-2 text-sm bg-[#1E6FD9] text-white rounded hover:bg-[#4A9FFF] transition-colors text-center font-medium"
-            >
-              Live Demo →
-            </a>
-          )}
-          {github && (
-            <a
-              href={github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 px-4 py-2 text-sm border border-[#1E6FD9] text-[#4A9FFF] rounded hover:bg-[#1E6FD9]/10 transition-colors text-center font-medium"
-            >
-              Code
-            </a>
-          )}
-        </div>
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <span
+          className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${typeStyles[project.type]}`}
+        >
+          {project.type}
+        </span>
+        <span className="font-display text-sm text-[var(--text-tertiary)] opacity-40">
+          {String(index + 1).padStart(2, '0')}
+        </span>
       </div>
-    </motion.div>
+
+      <h3 className="font-display text-xl text-[var(--text-primary)]">{project.name}</h3>
+      <p className="mt-1 text-sm font-medium text-[var(--brand-bright)]">{project.summary}</p>
+
+      <p className="mt-4 grow text-[15px] leading-relaxed text-[var(--text-secondary)]">
+        {project.description}
+      </p>
+
+      <div className="mt-6 flex flex-wrap gap-1.5">
+        {project.stack.map((tech) => (
+          <span
+            key={tech}
+            className="rounded-md border border-[var(--surface-hairline)] px-2 py-1 text-[11px] text-[var(--text-tertiary)]"
+          >
+            {tech}
+          </span>
+        ))}
+      </div>
+
+      {hasLinks ? (
+        <div className="mt-7 flex gap-2.5">
+          {project.live && (
+            <a
+              href={project.live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-bright)]"
+            >
+              Live demo
+              <IconArrowRight className="h-3.5 w-3.5" />
+            </a>
+          )}
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex flex-1 items-center justify-center rounded-lg border border-[var(--surface-hairline-strong)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:border-[var(--brand-bright)] hover:bg-white/[0.03]"
+            >
+              Source code
+            </a>
+          )}
+        </div>
+      ) : (
+        // An unverifiable claim is worse than an absent one — say so plainly
+        // rather than leaving a card that looks like it lost its buttons.
+        <p className="mt-7 rounded-lg border border-dashed border-[var(--surface-hairline)] px-4 py-2.5 text-center text-xs text-[var(--text-tertiary)]">
+          Private build — demo available on request
+        </p>
+      )}
+    </motion.article>
   );
 }

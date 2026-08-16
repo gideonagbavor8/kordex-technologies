@@ -1,121 +1,151 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { site, activeSocials, hasWhatsApp, whatsappLink } from '@/lib/site';
+import { socialIcons } from './SocialIcons';
+
+const columns = [
+  {
+    heading: 'Company',
+    links: [
+      { name: 'Services', href: '/services' },
+      { name: 'Our work', href: '/portfolio' },
+      { name: 'About', href: '/about' },
+      { name: 'Blog', href: '/blog' },
+    ],
+  },
+  {
+    heading: 'For schools',
+    links: [
+      { name: 'School management & LMS', href: '/services#school-platform' },
+      { name: 'AI tools for teachers', href: '/services#ai-teaching-tools' },
+      { name: 'Websites & admissions', href: '/services#school-websites' },
+      { name: 'Data protection', href: '/services#student-data-security' },
+    ],
+  },
+];
 
 export default function Footer() {
-  const footerLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Portfolio', href: '/portfolio' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Contact', href: '/contact' },
-  ];
-
-  const socialLinks = [
-    {
-      name: 'GitHub',
-      href: 'https://github.com/gideonagbavor8',
-      icon: '⚙️',
-    },
-    {
-      name: 'LinkedIn',
-      href: 'https://linkedin.com',
-      icon: '💼',
-    },
-    {
-      name: 'X',
-      href: 'https://x.com/KordexTech',
-      icon: '𝕏',
-    },
-  ];
-
   return (
-    <footer className="bg-[#0A1628] text-[#E8EDF5] py-16 border-t border-[#1E6FD9]/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-8">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-[#1E6FD9] rounded flex items-center justify-center font-semibold text-white">
-                KX
-              </div>
-              <div className="flex flex-col">
-                <span className="text-white font-semibold text-sm">Kordex</span>
-                <span className="text-[#4A9FFF] text-xs font-medium">
+    <footer className="border-t border-[var(--surface-hairline)] bg-[var(--surface-base)] pt-16 pb-10">
+      <div className="container-page">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:gap-12">
+          {/* Identity */}
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="mb-5 flex items-center gap-3">
+              <Image
+                src="/images/logo-mark.png"
+                alt=""
+                width={251}
+                height={325}
+                className="h-10 w-auto"
+              />
+              <span className="flex flex-col leading-none">
+                <span className="text-[15px] font-semibold text-[var(--text-primary)]">
+                  Kordex
+                </span>
+                <span className="mt-0.5 text-[13px] font-medium text-[var(--brand-bright)]">
                   Technologies
                 </span>
+              </span>
+            </Link>
+
+            <p className="max-w-xs text-sm leading-relaxed text-[var(--text-tertiary)]">
+              Education technology for African schools. Built in {site.location}.
+            </p>
+
+            {activeSocials.length > 0 && (
+              <div className="mt-6 flex gap-2.5">
+                {activeSocials.map((social) => (
+                  <a
+                    key={social.href}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    title={social.name}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--surface-hairline)] text-[var(--text-tertiary)] transition-colors hover:border-[var(--brand)] hover:bg-[var(--brand)] hover:text-white"
+                  >
+                    {socialIcons[social.name]}
+                  </a>
+                ))}
               </div>
+            )}
+          </div>
+
+          {columns.map((column) => (
+            <div key={column.heading}>
+              <h3 className="mb-4 text-sm font-semibold text-[var(--text-primary)]">
+                {column.heading}
+              </h3>
+              <ul className="space-y-2.5">
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-[var(--text-tertiary)] transition-colors hover:text-[var(--brand-bright)]"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-[#8BA5C8] text-sm mb-2">Execute with intelligence.</p>
-          </div>
+          ))}
 
-          {/* Quick Links */}
+          {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">Quick Links</h3>
-            <ul className="space-y-2">
-              {footerLinks.slice(0, 3).map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-[#8BA5C8] hover:text-[#4A9FFF] transition-colors text-sm"
+            <h3 className="mb-4 text-sm font-semibold text-[var(--text-primary)]">
+              Talk to us
+            </h3>
+            <ul className="space-y-2.5">
+              {hasWhatsApp && (
+                <li>
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--text-tertiary)] transition-colors hover:text-[var(--brand-bright)]"
                   >
-                    {link.name}
-                  </Link>
+                    WhatsApp +{site.whatsapp}
+                  </a>
                 </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* More Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">More</h3>
-            <ul className="space-y-2">
-              {footerLinks.slice(3).map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-[#8BA5C8] hover:text-[#4A9FFF] transition-colors text-sm"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Social Links */}
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm">Follow Us</h3>
-            <div className="flex gap-4">
-              {socialLinks.map((social) => (
+              )}
+              <li>
                 <a
-                  key={social.href}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-[#1E6FD9]/20 hover:bg-[#1E6FD9] rounded flex items-center justify-center transition-all text-[#4A9FFF] hover:text-white"
-                  title={social.name}
+                  href={`mailto:${site.email}`}
+                  className="break-all text-sm text-[var(--text-tertiary)] transition-colors hover:text-[var(--brand-bright)]"
                 >
-                  <span className="text-lg">{social.icon}</span>
+                  {site.email}
                 </a>
-              ))}
-            </div>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-sm font-semibold text-[var(--brand-bright)] transition-colors hover:text-[var(--brand)]"
+                >
+                  Book a consultation →
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-[#1E6FD9]/20 pt-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-[#8BA5C8]">
-            <p>&copy; 2024 Kordex Technologies. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 sm:mt-0">
-              <Link href="#" className="hover:text-[#4A9FFF] transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="#" className="hover:text-[#4A9FFF] transition-colors">
-                Terms of Service
-              </Link>
-            </div>
+        <div className="rule-fade my-10" />
+
+        <div className="flex flex-col items-center justify-between gap-4 text-sm text-[var(--text-tertiary)] sm:flex-row">
+          <p>
+            &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span>{' '}
+            {site.name}. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="transition-colors hover:text-[var(--brand-bright)]">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="transition-colors hover:text-[var(--brand-bright)]">
+              Terms of Service
+            </Link>
           </div>
         </div>
       </div>
