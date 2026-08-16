@@ -3,7 +3,8 @@ import ContactPageClient from '@/app/components/ContactPageClient';
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Start a project with Kordex Technologies. Get a response within 24 hours.',
+  description:
+    'Book a free 20-minute consultation with Kordex Technologies. We reply to every school enquiry within 24 hours.',
 };
 
 export default function Contact() {

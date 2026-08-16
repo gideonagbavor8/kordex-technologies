@@ -2,12 +2,34 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { IconArrowRight, IconCheck } from './Icons';
+import { serviceOptions } from '@/lib/services';
+
+const budgetOptions = [
+  'GHS 9,000–25,000 (USD 750–2,000)',
+  'GHS 25,000–60,000 (USD 2,000–5,000)',
+  'GHS 60,000–150,000 (USD 5,000–12,000)',
+  'GHS 150,000+ (USD 12,000+)',
+  'Not sure yet — help me scope it',
+];
+
+const fieldClass =
+  'w-full rounded-lg border border-[var(--surface-hairline)] bg-[var(--surface-base)] px-4 py-3 text-[var(--text-primary)] placeholder-[var(--text-tertiary)] transition-colors focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]/50 disabled:opacity-50';
+
+const selectChevron = {
+  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A9FFF' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 0.85rem center',
+  backgroundSize: '1.25em 1.25em',
+  paddingRight: '2.75rem',
+};
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    organisation: '',
     service: '',
     budget: '',
     description: '',
@@ -21,26 +43,23 @@ export default function ContactForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
     if (!formData.firstName.trim()) return 'First name is required';
     if (!formData.lastName.trim()) return 'Last name is required';
     if (!formData.email.trim()) return 'Email is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Valid email is required';
-    if (!formData.service) return 'Please select a service';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'A valid email is required';
+    if (!formData.service) return 'Please select what you need';
     if (!formData.budget) return 'Please select a budget range';
-    if (!formData.description.trim()) return 'Project description is required';
+    if (!formData.description.trim()) return 'Please tell us a little about your school';
     return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const validationError = validateForm();
     if (validationError) {
       setStatus('error');
@@ -55,9 +74,7 @@ export default function ContactForm() {
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -65,180 +82,240 @@ export default function ContactForm() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage("Message sent! We'll respond within 24 hours.");
+        // Only promise a confirmation email when one was actually sent — the
+        // sandbox mail sender cannot deliver to visitors.
+        setMessage(
+          data.confirmationSent
+            ? "Your message is with us. Check your inbox — we've sent a confirmation."
+            : 'Your message is with us, and it has landed in our inbox.'
+        );
         setFormData({
           firstName: '',
           lastName: '',
           email: '',
+          organisation: '',
           service: '',
           budget: '',
           description: '',
         });
-        setTimeout(() => setStatus('idle'), 5000);
       } else {
         setStatus('error');
-        setMessage(data.error || 'Failed to send message. Please try again.');
-        setTimeout(() => setStatus('idle'), 5000);
+        setMessage(data.error || 'Failed to send. Please try again or use WhatsApp.');
+        setTimeout(() => setStatus('idle'), 6000);
       }
-    } catch (error) {
+    } catch {
       setStatus('error');
-      setMessage('An error occurred. Please try again.');
-      setTimeout(() => setStatus('idle'), 5000);
+      setMessage('Something went wrong. Please try again or reach us on WhatsApp.');
+      setTimeout(() => setStatus('idle'), 6000);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, staggerChildren: 0.1, delayChildren: 0.2 },
-    },
+  const container = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+  };
+  const item = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
-  };
+  if (status === 'success') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        className="flex flex-col items-center justify-center py-14 text-center"
+      >
+        <span className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--success)]/15 text-[var(--success)]">
+          <IconCheck className="h-7 w-7" />
+        </span>
+        <h3 className="font-display text-2xl text-[var(--text-primary)]">
+          Message received
+        </h3>
+        <p className="mt-3 max-w-sm leading-relaxed text-[var(--text-secondary)]">{message}</p>
+        <p className="mt-2 text-sm text-[var(--text-tertiary)]">
+          We reply to every enquiry within 24 hours.
+        </p>
+        <button
+          onClick={() => setStatus('idle')}
+          className="mt-8 text-sm font-semibold text-[var(--brand-bright)] underline-offset-4 hover:underline"
+        >
+          Send another message
+        </button>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.form
       onSubmit={handleSubmit}
-      variants={containerVariants}
+      variants={container}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className="space-y-6"
+      className="space-y-5"
+      noValidate
     >
-      {/* Status Messages */}
-      {status === 'success' && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-green-900/30 border border-green-700/50 rounded-lg text-green-300 text-sm"
-        >
-          ✓ {message}
-        </motion.div>
-      )}
       {status === 'error' && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
+        <motion.p
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-300 text-sm"
+          role="alert"
+          className="rounded-lg border border-[var(--danger)]/40 bg-[var(--danger)]/10 px-4 py-3 text-sm text-[var(--danger)]"
         >
-          ✗ {message}
-        </motion.div>
+          {message}
+        </motion.p>
       )}
 
-      {/* First and Last Name */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="firstName"
-          placeholder="First name"
-          value={formData.firstName}
-          onChange={handleChange}
-          disabled={isLoading}
-          className="px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] placeholder-[#8BA5C8] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors disabled:opacity-50"
-        />
-        <input
-          type="text"
-          name="lastName"
-          placeholder="Last name"
-          value={formData.lastName}
-          onChange={handleChange}
-          disabled={isLoading}
-          className="px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] placeholder-[#8BA5C8] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors disabled:opacity-50"
-        />
+      <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="firstName" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+            First name
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            name="firstName"
+            autoComplete="given-name"
+            value={formData.firstName}
+            onChange={handleChange}
+            disabled={isLoading}
+            className={fieldClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="lastName" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+            Last name
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            name="lastName"
+            autoComplete="family-name"
+            value={formData.lastName}
+            onChange={handleChange}
+            disabled={isLoading}
+            className={fieldClass}
+          />
+        </div>
       </motion.div>
 
-      {/* Email */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={item}>
+        <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+          Email address
+        </label>
         <input
+          id="email"
           type="email"
           name="email"
-          placeholder="Email address"
+          autoComplete="email"
           value={formData.email}
           onChange={handleChange}
           disabled={isLoading}
-          className="w-full px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] placeholder-[#8BA5C8] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors disabled:opacity-50"
+          className={fieldClass}
         />
       </motion.div>
 
-      {/* Service Dropdown */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={item}>
+        <label htmlFor="organisation" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+          School or organisation{' '}
+          <span className="font-normal text-[var(--text-tertiary)]">(optional)</span>
+        </label>
+        <input
+          id="organisation"
+          type="text"
+          name="organisation"
+          autoComplete="organization"
+          value={formData.organisation}
+          onChange={handleChange}
+          disabled={isLoading}
+          className={fieldClass}
+        />
+      </motion.div>
+
+      <motion.div variants={item}>
+        <label htmlFor="service" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+          What do you need?
+        </label>
         <select
+          id="service"
           name="service"
           value={formData.service}
           onChange={handleChange}
           disabled={isLoading}
-          className="w-full px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors disabled:opacity-50 appearance-none cursor-pointer"
-          style={{
-            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A9FFF' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 0.75rem center',
-            backgroundSize: '1.5em 1.5em',
-            paddingRight: '2.5rem',
-          }}
+          className={`${fieldClass} cursor-pointer appearance-none`}
+          style={selectChevron}
         >
-          <option value="">Select a service</option>
-          <option value="Web & App Development">Web & App Development</option>
-          <option value="AI & Automation">AI & Automation</option>
-          <option value="Cybersecurity">Cybersecurity</option>
-          <option value="Education Technology">Education Technology</option>
-          <option value="Multiple services">Multiple services</option>
+          <option value="">Select an option</option>
+          {serviceOptions.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+          <option value="Several of these">Several of these</option>
+          <option value="Work outside education">Work outside education</option>
         </select>
       </motion.div>
 
-      {/* Budget Dropdown */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={item}>
+        <label htmlFor="budget" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+          Budget range
+        </label>
         <select
+          id="budget"
           name="budget"
           value={formData.budget}
           onChange={handleChange}
           disabled={isLoading}
-          className="w-full px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors disabled:opacity-50 appearance-none cursor-pointer"
-          style={{
-            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A9FFF' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 0.75rem center',
-            backgroundSize: '1.5em 1.5em',
-            paddingRight: '2.5rem',
-          }}
+          className={`${fieldClass} cursor-pointer appearance-none`}
+          style={selectChevron}
         >
-          <option value="">Select budget range</option>
-          <option value="Under GHS 2,000">Under GHS 2,000</option>
-          <option value="GHS 2,000–5,000">GHS 2,000–5,000</option>
-          <option value="GHS 5,000–10,000">GHS 5,000–10,000</option>
-          <option value="GHS 10,000+">GHS 10,000+</option>
-          <option value="Let's discuss">Let's discuss</option>
+          <option value="">Select a range</option>
+          {budgetOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
       </motion.div>
 
-      {/* Description */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={item}>
+        <label htmlFor="description" className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
+          Tell us about your school
+        </label>
         <textarea
+          id="description"
           name="description"
-          placeholder="Tell us about your project"
+          placeholder="How many students? What is costing your staff the most time right now?"
           value={formData.description}
           onChange={handleChange}
           disabled={isLoading}
           rows={5}
-          className="w-full px-4 py-3 bg-[#112040] border border-[#1E6FD9]/20 rounded-lg text-[#F5F7FA] placeholder-[#8BA5C8] focus:outline-none focus:border-[#1E6FD9] focus:ring-1 focus:ring-[#1E6FD9]/50 transition-colors resize-none disabled:opacity-50"
+          className={`${fieldClass} resize-none`}
         />
       </motion.div>
 
-      {/* Submit Button */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={item}>
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full px-8 py-3 bg-gradient-to-r from-[#1E6FD9] to-[#4A9FFF] text-[#0A1628] font-semibold rounded-lg hover:from-[#4A9FFF] hover:to-[#1E6FD9] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand)] px-8 py-3.5 font-semibold text-white shadow-lg shadow-[var(--brand)]/25 transition-all hover:bg-[var(--brand-bright)] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isLoading ? 'Sending...' : 'Send Message →'}
+          {isLoading ? (
+            'Sending…'
+          ) : (
+            <>
+              Send message
+              <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </button>
+        <p className="mt-4 text-center text-xs text-[var(--text-tertiary)]">
+          We reply within 24 hours. No mailing list, no follow-up spam.
+        </p>
       </motion.div>
     </motion.form>
   );

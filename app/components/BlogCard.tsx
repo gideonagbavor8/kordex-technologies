@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { BlogPostMeta } from '@/lib/blog';
+import { IconArrowRight } from './Icons';
 
 interface BlogCardProps {
   post: BlogPostMeta;
@@ -10,7 +11,7 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ post, index }: BlogCardProps) {
-  const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
+  const formattedDate = new Date(post.date).toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -20,36 +21,42 @@ export default function BlogCard({ post, index }: BlogCardProps) {
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      viewport={{ once: true }}
-      className="p-6 bg-gradient-to-br from-[#112040] to-[#0A1628] border border-[#1E6FD9]/20 rounded-xl hover:border-[#1E6FD9]/40 transition-all duration-300"
+      transition={{ delay: Math.min(index, 5) * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, margin: '-40px' }}
+      className="panel panel-interactive group flex flex-col p-7"
     >
-      <div className="mb-4">
-        <h2 className="text-2xl font-semibold text-[#E8EDF5] mb-2 line-clamp-2 hover:text-[#4A9FFF] transition-colors">
-          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-        </h2>
-        <p className="text-[#8BA5C8] text-sm">{formattedDate}</p>
-      </div>
+      <time dateTime={post.date} className="text-sm text-[var(--text-tertiary)]">
+        {formattedDate}
+      </time>
 
-      <p className="text-[#8BA5C8] mb-4 line-clamp-3">{post.excerpt}</p>
+      <h2 className="mt-3 font-display text-xl leading-snug text-[var(--text-primary)] transition-colors group-hover:text-[var(--brand-bright)]">
+        {/* Stretched link makes the whole card clickable without nesting anchors. */}
+        <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0">
+          {post.title}
+        </Link>
+      </h2>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {post.tags.map((tag, i) => (
-          <span
-            key={i}
-            className="px-2 py-1 text-xs bg-[#1E6FD9]/20 text-[#4A9FFF] rounded-full"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      <p className="mt-3 grow text-[15px] leading-relaxed text-[var(--text-secondary)]">
+        {post.excerpt}
+      </p>
 
-      <Link
-        href={`/blog/${post.slug}`}
-        className="inline-flex items-center text-[#4A9FFF] hover:text-[#1E6FD9] transition-colors font-medium text-sm"
-      >
-        Read more →
-      </Link>
+      {post.tags.length > 0 && (
+        <div className="mt-6 flex flex-wrap gap-1.5">
+          {post.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md border border-[var(--surface-hairline)] px-2 py-1 text-[11px] text-[var(--text-tertiary)]"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-bright)]">
+        Read more
+        <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+      </span>
     </motion.article>
   );
 }

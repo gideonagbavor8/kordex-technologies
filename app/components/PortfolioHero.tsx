@@ -4,23 +4,37 @@ import { motion } from 'framer-motion';
 
 export default function PortfolioHero() {
   return (
-    <section className="py-20 bg-[#0A1628] px-4 sm:px-6 lg:px-8 pt-32">
+    <section className="relative isolate overflow-hidden bg-[var(--surface-base)] pt-36 pb-16 sm:pt-40">
+      <div
+        className="dot-field absolute inset-0 opacity-40"
+        style={{
+          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, #000 10%, transparent 75%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 70% 60% at 50% 30%, #000 10%, transparent 75%)',
+        }}
+      />
+      <div className="pointer-events-none absolute -left-32 top-0 h-96 w-96 rounded-full bg-[var(--brand)] opacity-[0.1] blur-[120px]" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="max-w-3xl mx-auto text-center"
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        className="container-page relative z-10"
       >
-        <h1
-          className="text-5xl sm:text-6xl font-bold text-[#F5F7FA] mb-6"
-          style={{ fontFamily: 'var(--font-playfair)' }}
-        >
-          Our Portfolio
-        </h1>
-        <p className="text-lg text-[#8BA5C8] leading-relaxed">
-          Selected projects showcasing our expertise across web development, AI, cybersecurity, 
-          and education technology. Each project represents our commitment to excellence and innovation.
-        </p>
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="eyebrow mb-5 justify-center">
+            <span className="h-px w-6 bg-[var(--brand-bright)] opacity-60" />
+            Our work
+          </p>
+          <h1 className="font-display text-[length:var(--text-h1)] leading-[1.06] text-[var(--text-primary)]">
+            What we have built so far
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
+            Every project is labelled for what it is — client work, a product we built
+            in-house, or something we open sourced. We would rather show you less and
+            have you trust all of it.
+          </p>
+        </div>
       </motion.div>
     </section>
   );
